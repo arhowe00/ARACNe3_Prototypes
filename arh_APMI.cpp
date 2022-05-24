@@ -14,50 +14,54 @@ using namespace std;
 
 static float q_thresh = 7.815;
 static unsigned short size_thresh, tot_squares;
-typedef struct {float x_bound1, x_bound2, y_bound1, y_bound2; unsigned long n_samps;} square;
+typedef struct {const float x_bound1, x_bound2, y_bound1, y_bound2; const unsigned long n_samps;} square;
 
-void APMI_split(vector<short> pts, vector<double> *vec_x, vector<double> *vec_y, square *p, vector<square> *ps) {
-	float E = p->n_samps / 4.0;
-	float x_thresh = (p->x_bound1 + p->x_bound2)/2.0;
-	float y_thresh = (p->y_bound1 + p->y_bound2)/2.0;
+void APMI_split(vector<short> pts, vector<double> *vec_x, vector<double> *vec_y, square *s, vector<square> *ss) {
+	const float E = s->n_samps / 4.0, 
+	      x_thresh = (s->x_bound1 + s->x_bound2)/2.0, 
+	      y_thresh = (s->y_bound1 + s->y_bound2)/2.0;
 
-	if (p->n_samps < size_thresh) {ps->push_back(*p); return;}
+	if (s->n_samps < size_thresh) {ss->push_back(*s); return;}
 
-	vector<short> pts1, pts2, pts3, pts4;
+	vector<short> tr_pts, br_pts, bl_pts, tl_pts;
 
-	for (short &p : pts) {
+	for (auto &p : pts) {
 		if ((*vec_x)[p] >= x_thresh && (*vec_y)[p] >= y_thresh) {
-			pts1.push_back(p);
+			tr_pts.push_back(p);
 		} else if ((*vec_x)[p] >= x_thresh && (*vec_y)[p] <= y_thresh) {
-			pts2.push_back(p);
+			br_pts.push_back(p);
 		} else if ((*vec_x)[p] <= x_thresh && (*vec_y)[p] <= y_thresh) {
-			pts3.push_back(p);
+			bl_pts.push_back(p);
 		} else {
-			pts4.push_back(p);
+			tl_pts.push_back(p);
 		}
 	}
 
-	float chisq = pow(pts1.size() - E, 2)/E +
-		pow(pts2.size() - E, 2)/E +
-		pow(pts3.size() - E, 2)/E +
-		pow(pts4.size() - E, 2)/E;
+	float chisq = pow(tr_pts.size() - E, 2)/E +
+		pow(br_pts.size() - E, 2)/E +
+		pow(bl_pts.size() - E, 2)/E +
+		pow(tl_pts.size() - E, 2)/E;
 
 	if (chisq > q_thresh) {
-		square tr{x_thresh, p->x_bound2, y_thresh, p->y_bound2, pts1.size()};
-		square br{x_thresh, p->x_bound2, p->y_bound1, y_thresh, pts2.size()};
-		square bl{p->x_bound1, x_thresh, p->y_bound1, y_thresh, pts3.size()};
-		square tl{p->x_bound1, x_thresh, y_thresh, p->y_bound2, pts4.size()};
+		square tr{x_thresh, s->x_bound2, y_thresh, s->y_bound2, tr_pts.size()}, 
+		       br{x_thresh, s->x_bound2, s->y_bound1, y_thresh, br_pts.size()}, 
+		       bl{s->x_bound1, x_thresh, s->y_bound1, y_thresh, bl_pts.size()}, 
+		       tl{s->x_bound1, x_thresh, y_thresh, s->y_bound2, tl_pts.size()};
 
-		APMI_split(pts1, vec_x, vec_y, &tr, ps);
-		APMI_split(pts2, vec_x, vec_y, &br, ps);
-		APMI_split(pts3, vec_x, vec_y, &bl, ps);
-		APMI_split(pts4, vec_x, vec_y, &tl, ps);
+		APMI_split(tr_pts, vec_x, vec_y, &tr, ss);
+		APMI_split(br_pts, vec_x, vec_y, &br, ss);
+		APMI_split(bl_pts, vec_x, vec_y, &bl, ss);
+		APMI_split(tl_pts, vec_x, vec_y, &tl, ss);
 	} else {
-		ps->push_back(*p);
+		ss->push_back(*s);
 	}
 }
 
-float* APMIptr(vector<double> vec_x, vector<double> vec_y, double p_thresh = 0.05, unsigned short size_thresh = 4) {
+// WRAPPER for external use
+// takes in two vectors, p-value and size thresholds
+// returns vector of MI values for each region
+// [[Rcpp::export]]
+vector<double> APMI(vector<double> vec_x, vector<double> vec_y, double p_thresh = 0.05, unsigned short size_thresh = 4) {
 	::size_thresh = size_thresh;
 
 	vector<short> pts;
@@ -67,28 +71,17 @@ float* APMIptr(vector<double> vec_x, vector<double> vec_y, double p_thresh = 0.0
 	unsigned short n_tot = pts.size();
 
 	vector<square> squares;
-	square p{0.0, 1.0, 0.0, 1.0, n_tot};
-	APMI_split(pts, &vec_x, &vec_y, &p, &squares);
+	square s{0.0, 1.0, 0.0, 1.0, n_tot};
+	APMI_split(pts, &vec_x, &vec_y, &s, &squares);
 	tot_squares = squares.size();
 
-	float *mi_vals = static_cast<float*>(malloc(squares.size() * sizeof(float))), mi;
+	float mi_vals[squares.size()], mi;
 	short i = 0;
 	for (auto sq : squares) {
 		const float pxy = sq.n_samps/(float) n_tot, marginal = sq.x_bound2 - sq.x_bound1;
 		mi_vals[i] = isfinite(mi = pxy*log(pxy/marginal/marginal)) ? mi : 0.0;
 		++i;
 	}
-	return mi_vals;
-}
-
-// WRAPPER for external use
-// takes in two vectors, p-value and size thresholds
-// returns vector of MI values for each region
-// [[Rcpp::export]]
-vector<double> APMI(vector<double> vec_x, vector<double> vec_y, double p_thresh = 0.05, unsigned short size_thresh = 4) {
-	float *mis = APMIptr(vec_x, vec_y, p_thresh, size_thresh);
-	vector<double> returnvec;
-	for (auto i = 0; i < tot_squares; ++i) {returnvec.push_back(mis[i]);}
-	free(mis);
-	return returnvec;
+	vector<double> mi_vec(mi_vals, &mi_vals[squares.size()])
+	return mi_vec;
 }
