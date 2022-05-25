@@ -14,7 +14,7 @@ using namespace std;
 
 
 /*
- * Global variables will be modified, but q_thresh is set by default here
+ * Global variables will be modified
  */
 static float q_thresh;
 static unsigned short size_thresh, tot_squares;
@@ -103,7 +103,7 @@ vector<float> APMI(vector<float> vec_x, vector<float> vec_y, float q_thresh = 7.
 	// Make a 
 	//
 	// CHANGE PTS AS UNSIGNED SHORT * TO WORK WITH APMI RECURSE
-	const unsigned short n_tot = vec_x.size();
+	const unsigned short n_tot = vec_x.size(), pts[vec_x.size()];
 	const short pts[vec_x.size()];
 	for (short i = 0; i < n_tot; i++) { pts[i] = i; }
 
