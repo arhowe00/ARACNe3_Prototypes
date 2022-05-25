@@ -3,8 +3,6 @@
 //
 // LIST OF OPTIMIZATIONS TO BE MADE:
 // Parallel for loop computation (Lukas's Idea)
-// Malloc for every square, do not push_back, increment tot_squares as a global
-// variable
 
 #include <vector>
 #include <numeric>
@@ -35,7 +33,7 @@ float calcMI(square *s) {
 }
 
 /*
- * Recursive tessellation of XY plane and mi calculation at dead-end
+ * Recursive tessellation of XY plane and mi calculation at dead-ends
  * 
  * s a pointer to the square we are considering to partition
  * mis a pointer to a vector of mis 
@@ -59,12 +57,13 @@ void APMI_split(square *s, vector<float> *mis) {
 	      tl_pts[num_pts], tr_num_pts=0, br_num_pts=0, bl_num_pts=0, 
 	      tl_num_pts=0;
 
-	// points that belong to each quandrant are discovered and sorted
+	// points that belong to each quadrant are discovered and sorted
 	// outer for loop will iterate through the pts array
 	for (unsigned short i = 0; i < num_pts; ++i) {
 		// we must pull the actual point index from the pts array
 		const unsigned short p = pts[i];
-		const bool top = vec_y[p] >= y_thresh, right = vec_x[p] >= x_thresh;
+		const bool top = vec_y[p] >= y_thresh, 
+		      right = vec_x[p] >= x_thresh;
 		if (top && right) { tr_pts[tr_num_pts++] = p; } 
 		else if (right) { br_pts[br_num_pts++] = p; } 
 		else if (top) { tl_pts[tl_num_pts++] = p; } 
@@ -109,7 +108,8 @@ void APMI_split(square *s, vector<float> *mis) {
  */
 // [[Rcpp::export]]
 vector<float> APMI(vector<float> vec_x, vector<float> vec_y, 
-		const float q_thresh = 7.815, const unsigned short size_thresh = 4) {
+		const float q_thresh = 7.815, 
+		const unsigned short size_thresh = 4) {
 	// Set global variables
 	::size_thresh = size_thresh;
 	::q_thresh = q_thresh;
