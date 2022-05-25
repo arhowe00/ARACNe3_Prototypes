@@ -1,5 +1,12 @@
 // [[Rcpp::depends(BH)]]
 // [[Rcpp::plugins("cpp11")]]
+//
+//
+//
+// LIST OF OPTIMIZATIONS TO BE MADE:
+// Parallel for loop computation (Lukas's Idea)
+// Malloc for every square, do not push_back, increment tot_squares as a global
+// variable
 
 #include <vector>
 #include <numeric>
@@ -13,118 +20,135 @@
 using namespace std;
 
 
+// This should be moved to a header file eventually
+typedef struct {const float x_bound1, y_bound1, width; 
+	const unsigned short *pts, num_pts;} square;
+
 /*
  * Global variables will be modified
  */
 static float q_thresh;
-static unsigned short size_thresh, tot_squares;
-typedef struct {const float x_bound1, x_bound2, y_bound1, y_bound2; const unsigned long n_samps;} square;
-
+static vector<float> vec_x, vec_y;
+static unsigned short tot_num_pts, size_thresh;
 
 /*
- * Recursive tessellation of XY plane (regulator-target expression for each sample)
+ * Calculate the MI for a square struct
+ */
+float calcMI(square *s) {
+	const float pxy = s->num_pts/(float)tot_num_pts, marginal = s->width;
+	float mi;
+	return isfinite(mi = pxy*log(pxy/marginal/marginal)) ? mi : 0.0;
+}
+
+/*
+ * Recursive tessellation of XY plane and mi calculation at dead-end
  * 
- * pts a vector of indices to access in vec_x and vec_y
- * vec_x a pointer to the original X-expression vector
- * vec_y a pointer to the original Y-expression vector
  * s a pointer to the square we are considering to partition
- * ss a pointer to a vector of squares that cannot be further split
+ * mis a pointer to a vector of mis 
  *
  * returns nothing; values computed from pointers to original
  */
-void APMI_split(vector<short> pts, vector<float> *vec_x, vector<float> *vec_y, square *s, vector<square> *ss) {
-	// expected counts for chi-square, thresholds for potential partition of
-	// square
-	const float E = s->n_samps / 4.0, 
-	      x_thresh = (s->x_bound1 + s->x_bound2)/2.0, 
-	      y_thresh = (s->y_bound1 + s->y_bound2)/2.0;
+void APMI_split(square *s, vector<float> *mis) {
+	// extract values; memory disadvantage but runtime advantage
+	const float x_bound1=s->x_bound1, y_bound1=s->y_bound1, width=s->width;
+	const unsigned short *pts=s->pts, num_pts=s->num_pts;
 
-	// vector of indices for quadrants, to test chi-square
-	vector<short> tr_pts, br_pts, bl_pts, tl_pts;
+	// if we have less points in the square than size_thresh, calc MI
+	if (num_pts < size_thresh) {mis->push_back(calcMI(s)); return;}
+
+	// thresholds for potential partition of XY plane
+	const float x_thresh = x_bound1 + width/2.0, 
+	      y_thresh = y_bound1 + width/2.0;
+
+	// indices for quadrants, to test chi-square, with num_pts for each
+	unsigned short tr_pts[num_pts], br_pts[num_pts], bl_pts[num_pts], 
+	      tl_pts[num_pts], tr_num_pts=0, br_num_pts=0, bl_num_pts=0, 
+	      tl_num_pts=0;
 
 	// points that belong to each quandrant are discovered and sorted
-	for (auto &p : pts) {
-		if ((*vec_x)[p] >= x_thresh && (*vec_y)[p] >= y_thresh) {
-			tr_pts.push_back(p);
-		} else if ((*vec_x)[p] >= x_thresh && (*vec_y)[p] <= y_thresh) {
-			br_pts.push_back(p);
-		} else if ((*vec_x)[p] <= x_thresh && (*vec_y)[p] <= y_thresh) {
-			bl_pts.push_back(p);
-		} else {
-			tl_pts.push_back(p);
-		}
+	// outer for loop will iterate through the pts array
+	for (unsigned short i = 0; i < num_pts; ++i) {
+		// we must pull the actual point index from the pts array
+		const unsigned short p = pts[i];
+		const bool top = vec_y[p] >= y_thresh, right = vec_x[p] >= x_thresh;
+		if (top && right) { tr_pts[tr_num_pts++] = p; } 
+		else if (right) { br_pts[br_num_pts++] = p; } 
+		else if (top) { tl_pts[tl_num_pts++] = p; } 
+		else { bl_pts[bl_num_pts++] = p; }
 	}
 	
-	// if we have less points in the square than
-	if (s->n_samps < size_thresh) {ss->push_back(*s); return;}
 
-	// if we have the initial square, we must partition once
-	if (s->n_samps == vec_x->size()) {goto partition;}
+	// compute chi-square, more efficient not to use pow()
+	const float E = num_pts / 4.0, chisq = ((tr_num_pts-E)*(tr_num_pts-E) +
+		(br_num_pts-E)*(br_num_pts-E) +
+		(bl_num_pts-E)*(bl_num_pts-E) +
+		(tl_num_pts-E)*(tl_num_pts-E))/E;
 
-	// compute chi-square
-	float chisq = pow(tr_pts.size() - E, 2)/E +
-		pow(br_pts.size() - E, 2)/E +
-		pow(bl_pts.size() - E, 2)/E +
-		pow(tl_pts.size() - E, 2)/E;
+	// partition if chi-square or if initial square
+	if (chisq > q_thresh || num_pts == tot_num_pts) {
+		cout << "SPLIT" << endl;
 
-	if (chisq > q_thresh) {
-	partition: 
-		square tr{x_thresh, s->x_bound2, y_thresh, s->y_bound2, tr_pts.size()}, 
-		       br{x_thresh, s->x_bound2, s->y_bound1, y_thresh, br_pts.size()}, 
-		       bl{s->x_bound1, x_thresh, s->y_bound1, y_thresh, bl_pts.size()}, 
-		       tl{s->x_bound1, x_thresh, y_thresh, s->y_bound2, tl_pts.size()};
+		cout << "XBOUND1 " << x_bound1 << endl;
+		cout << "YBOUND1 " << y_bound1 << endl;
+		cout << "WIDTH " << width << endl;
 
-		APMI_split(tr_pts, vec_x, vec_y, &tr, ss);
-		APMI_split(br_pts, vec_x, vec_y, &br, ss);
-		APMI_split(bl_pts, vec_x, vec_y, &bl, ss);
-		APMI_split(tl_pts, vec_x, vec_y, &tl, ss);
+		cout << "NUM POINTS " << num_pts << endl;
+		cout << "TOT " << tot_num_pts << endl;
+		cout << "CHISQ " << chisq << endl;
+		cout << "Q THRESH " << q_thresh << endl << endl << endl;
+		square tr{x_thresh, y_thresh, width/2, tr_pts, tr_num_pts}, 
+		       br{x_thresh, y_bound1, width/2, br_pts, br_num_pts}, 
+		       bl{x_bound1, y_bound1, width/2, bl_pts, bl_num_pts}, 
+		       tl{x_bound1, y_thresh, width/2, tl_pts, tl_num_pts};
+
+		APMI_split(&tr, mis);
+		APMI_split(&br, mis);
+		APMI_split(&bl, mis);
+		APMI_split(&tl, mis);
 	} else {
-		// if we don't partition, then we add the square to the vector
-		ss->push_back(*s);
+		// if we don't partition, then we calc MI
+		mis->push_back(calcMI(s));
 	}
+
+	return;
 }
 
 // Takes in two expression vectors (regulator-target) and computes APMI for
 // each partition of the observation space
 //
 // vec_x an X expression vector
-// vec_y a Y experssion vector
+// vec_y a Y expression vector
 // q_thresh q-value for chi-square bin independence
 // size_thresh minimum points in a tile to consider chi-square and partition
 //
 // returns a vector of all MI values computed in the observation space
 //
 // [[Rcpp::export]]
-vector<float> APMI(vector<float> vec_x, vector<float> vec_y, float q_thresh = 7.815, unsigned short size_thresh = 4) {
+vector<float> APMI(vector<float> vec_x, vector<float> vec_y, 
+		const float q_thresh = 7.815, const unsigned short size_thresh = 4) {
 	// Set global variables
 	::size_thresh = size_thresh;
 	::q_thresh = q_thresh;
+	::vec_x = vec_x;
+	::vec_y = vec_y;
+	::tot_num_pts = vec_x.size();
 
-	// Make a 
-	//
-	// CHANGE PTS AS UNSIGNED SHORT * TO WORK WITH APMI RECURSE
-	const unsigned short n_tot = vec_x.size(), pts[vec_x.size()];
-	const short pts[vec_x.size()];
-	for (short i = 0; i < n_tot; i++) { pts[i] = i; }
+	// Make an array of all indices, to be partitioned later
+	unsigned short all_pts[vec_x.size()];
+	for (unsigned short i = 0; i < tot_num_pts; i++) { all_pts[i] = i; }
 
+	// Initialize plane and calc all MIs
+	square init{0.0, 0.0, 1.0, all_pts, tot_num_pts};	
+	vector<float> mis;
+	APMI_split(&init, &mis);
 
-	vector<square> squares;
-	// q_thresh should be a variable
-	// matrix and list of regulators
-	square s{0.0, 1.0, 0.0, 1.0, n_tot};	
-	APMI_split(pts, &vec_x, &vec_y, &s, &squares);
-	tot_squares = squares.size();
-
-	float mi_vals[squares.size()], mi;
-	short i = 0;
-	
-	for (auto sq : squares) {
-		const float pxy = sq.n_samps/(float) n_tot, marginal = sq.x_bound2 - sq.x_bound1;
-		mi_vals[i] = isfinite(mi = pxy*log(pxy/marginal/marginal)) ? mi : 0.0;
-		++i;
-	}
-	vector<float> mi_vec(mi_vals, &mi_vals[squares.size()]);
-	return mi_vec;
+	return mis;
 }
 
-int main() {}
+int main() {
+	vector<float> x = {0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0};
+	vector<float> y = {0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0};
+	vector<float> mis = APMI(x,y);
+	for (auto mi : mis) {cout << mi << endl;}
+	return 0;
+}
