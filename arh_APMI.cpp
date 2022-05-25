@@ -1,8 +1,6 @@
 // [[Rcpp::depends(BH)]]
 // [[Rcpp::plugins("cpp11")]]
 //
-//
-//
 // LIST OF OPTIMIZATIONS TO BE MADE:
 // Parallel for loop computation (Lukas's Idea)
 // Malloc for every square, do not push_back, increment tot_squares as a global
@@ -13,10 +11,10 @@
 #include <algorithm>
 #include <iostream>
 #include <math.h>
-//#include <boost/math/distributions/chi_squared.hpp>
-//#include <Rcpp.h>
+#include <boost/math/distributions/chi_squared.hpp>
+#include <Rcpp.h>
 
-//using namespace Rcpp;
+using namespace Rcpp;
 using namespace std;
 
 
@@ -86,16 +84,6 @@ void APMI_split(square *s, vector<float> *mis) {
 
 	// partition if chi-square or if initial square
 	if (chisq > q_thresh || num_pts == tot_num_pts) {
-		cout << "SPLIT" << endl;
-
-		cout << "XBOUND1 " << x_bound1 << endl;
-		cout << "YBOUND1 " << y_bound1 << endl;
-		cout << "WIDTH " << width << endl;
-
-		cout << "NUM POINTS " << num_pts << endl;
-		cout << "TOT " << tot_num_pts << endl;
-		cout << "CHISQ " << chisq << endl;
-		cout << "Q THRESH " << q_thresh << endl << endl << endl;
 		square tr{x_thresh, y_thresh, width/2, tr_pts, tr_num_pts}, 
 		       br{x_thresh, y_bound1, width/2, br_pts, br_num_pts}, 
 		       bl{x_bound1, y_bound1, width/2, bl_pts, bl_num_pts}, 
@@ -146,9 +134,9 @@ vector<float> APMI(vector<float> vec_x, vector<float> vec_y,
 }
 
 int main() {
-	vector<float> x = {0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0};
-	vector<float> y = {0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0};
-	vector<float> mis = APMI(x,y);
-	for (auto mi : mis) {cout << mi << endl;}
-	return 0;
+	//vector<float> x = {0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0};
+	//vector<float> y = {0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0};
+	//vector<float> mis = APMI(x,y);
+	//for (auto mi : mis) {cout << mi << endl;}
+	//return 0;
 }
