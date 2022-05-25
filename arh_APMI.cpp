@@ -11,16 +11,12 @@
 #include <algorithm>
 #include <iostream>
 #include <math.h>
-#include <boost/math/distributions/chi_squared.hpp>
-#include <Rcpp.h>
+//#include <boost/math/distributions/chi_squared.hpp>
+//#include <Rcpp.h>
+#include "ARACNe3.h"
 
-using namespace Rcpp;
+//using namespace Rcpp;
 using namespace std;
-
-
-// This should be moved to a header file eventually
-typedef struct {const float x_bound1, y_bound1, width; 
-	const unsigned short *pts, num_pts;} square;
 
 /*
  * Global variables will be modified
@@ -101,16 +97,16 @@ void APMI_split(square *s, vector<float> *mis) {
 	return;
 }
 
-// Takes in two expression vectors (regulator-target) and computes APMI for
-// each partition of the observation space
-//
-// vec_x an X expression vector
-// vec_y a Y expression vector
-// q_thresh q-value for chi-square bin independence
-// size_thresh minimum points in a tile to consider chi-square and partition
-//
-// returns a vector of all MI values computed in the observation space
-//
+/* Takes in two expression vectors (regulator-target) and computes APMI for 
+ * each partition of the observation space
+ *                                                                           
+ * vec_x an X expression vector
+ * vec_y a Y expression vector
+ * q_thresh q-value for chi-square bin independence
+ * size_thresh minimum points in a tile to consider chi-square and partition
+ *                                                                           
+ * returns a vector of all MI values computed in the observation space
+ */
 // [[Rcpp::export]]
 vector<float> APMI(vector<float> vec_x, vector<float> vec_y, 
 		const float q_thresh = 7.815, const unsigned short size_thresh = 4) {
