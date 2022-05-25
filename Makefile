@@ -8,6 +8,8 @@ LDLIBS =
 
 
 .PHONY: all
-all: arh_APMI 
+all: arh_APMI arh_MatrixReglistIO
 
 arh_APMI: 
+
+arh_MatrixReglistIO:

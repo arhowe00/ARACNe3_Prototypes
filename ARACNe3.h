@@ -1,3 +1,5 @@
+#include <vector>
+
 #ifndef _ARACNE3_H_
 #define _ARACNE3_H_
 
