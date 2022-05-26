@@ -21,7 +21,11 @@ typedef struct {const float x_bound1, y_bound1, width;
  */
 typedef std::unordered_map<std::string, std::vector<float>> hashmap;
 
-std::vector<float> APMI(std::vector<float>, std::vector<float>, const float, 
+float APMI(std::vector<float>, std::vector<float>, const float, 
 		const unsigned short);
+
+std::vector<std::string> readRegList(std::string);
+
+hashmap readTransformedGexpMatrix(std::string);
 
 #endif /* #ifndef _ARACNE3_H_ */

@@ -105,10 +105,10 @@ void APMI_split(square *s) {
  * q_thresh q-value for chi-square bin independence
  * size_thresh minimum points in a tile to consider chi-square and partition
  *                                                                           
- * returns a vector of all MI values computed in the observation space
+ * returns the APMI 
  */
 // [[Rcpp::export]]
-vector<float> APMI(vector<float> vec_x, vector<float> vec_y, 
+float APMI(vector<float> vec_x, vector<float> vec_y, 
 		const float q_thresh = 7.815, 
 		const unsigned short size_thresh = 4) {
 	// Set global variables
@@ -126,7 +126,7 @@ vector<float> APMI(vector<float> vec_x, vector<float> vec_y,
 	square init{0.0, 0.0, 1.0, all_pts, tot_num_pts};	
 	APMI_split(&init);
 
-	return mis;
+	return std::accumulate(mis.begin(), mis.end(), static_cast<float>(0.0));
 }
 
 int main() {
