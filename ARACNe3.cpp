@@ -29,6 +29,7 @@ int main(int argc, char *argv[]) {
 				}	
 			}
 			cout.rdbuf(cout_buff);
+			return 0;
 		}
 	}
 }
