@@ -15,6 +15,5 @@ modify the Makefile and just run 'make'
 
 
 **LIST OF IMPROVEMENTS TO MAKE**
- - Calculating ROW-APMI, or not having to copy vec_x many many times
  - Lukas's idea of parallel for loop calculation (opmi something??)
  - More efficient hashmap processing
