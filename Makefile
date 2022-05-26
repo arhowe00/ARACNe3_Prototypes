@@ -7,9 +7,21 @@ LDFLAGS = -L/opt/homebrew/Cellar/boost/1.78.0_1/lib/
 LDLIBS = 
 
 
-.PHONY: all
-all: arh_APMI arh_MatrixReglistIO
+ARACNe3: arh_APMI.o arh_MatrixReglistIO.o
+
+arh_APMI.o:
+
+arh_MatrixReglistIO.o:
+
 
 arh_APMI: 
 
 arh_MatrixReglistIO:
+
+
+.PHONY: all
+all: arh_ARACNe3 arh_APMI arh_MatrixReglistIO
+
+.PHONY: clean
+clean: 
+	rm *.o arh_APMI arh_MatrixReglistIO

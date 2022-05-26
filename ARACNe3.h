@@ -1,6 +1,8 @@
 #include <vector>
 #include <string>
 #include <unordered_map>
+#include <iostream>
+#include <fstream>
 
 #ifndef _ARACNE3_H_
 #define _ARACNE3_H_
@@ -21,7 +23,7 @@ typedef struct {const float x_bound1, y_bound1, width;
  */
 typedef std::unordered_map<std::string, std::vector<float>> hashmap;
 
-float APMI(std::vector<float>, std::vector<float>, const float, 
+float APMI(std::vector<float>, std::vector<float>, const float q_thresh, 
 		const unsigned short);
 
 std::vector<std::string> readRegList(std::string);

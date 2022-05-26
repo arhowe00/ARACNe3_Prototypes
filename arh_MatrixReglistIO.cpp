@@ -67,9 +67,9 @@ hashmap readTransformedGexpMatrix(string filename = "exp_mat.txt") {
 	return hm;
 }
 
-int main() {
-	string regulator_file = "test/regulators.txt";
-	string matrix_file = "test/exp_mat.txt";
+//int main() {
+	//string regulator_file = "test/regulators.txt";
+	//string matrix_file = "test/exp_mat.txt";
 
 	//const vector<string> regulators = readRegList(regulator_file);
 	//for (string reg : regulators) { cout << reg << endl; }
@@ -80,5 +80,5 @@ int main() {
 	//	expression[reg][samps - 1] << endl; }
 	//cout << "SAMPS: " << samps << endl;
 
-	return 0;
-}
+	//return 0;
+//}

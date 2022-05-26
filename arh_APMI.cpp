@@ -118,6 +118,9 @@ float APMI(vector<float> vec_x, vector<float> vec_y,
 	::vec_y = vec_y;
 	::tot_num_pts = vec_x.size();
 
+	// clear the mis vector -- THIS IS VERY INEFFICIENT AND SHALL CHANGE
+	mis.clear();
+
 	// Make an array of all indices, to be partitioned later
 	unsigned short all_pts[vec_x.size()];
 	for (unsigned short i = 0; i < tot_num_pts; i++) { all_pts[i] = i; }
@@ -129,10 +132,10 @@ float APMI(vector<float> vec_x, vector<float> vec_y,
 	return std::accumulate(mis.begin(), mis.end(), static_cast<float>(0.0));
 }
 
-int main() {
+//int main() {
 	//vector<float> x = {0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0};
 	//vector<float> y = {0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0};
 	//vector<float> mis = APMI(x,y);
 	//for (auto mi : mis) {cout << mi << endl;}
 	//return 0;
-}
+//}
