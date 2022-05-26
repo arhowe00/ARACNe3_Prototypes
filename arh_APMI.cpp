@@ -142,7 +142,6 @@ float APMI(vector<float> vec_x, vector<float> vec_y,
  *
  * It will print the values to the stream
  */
-
 void rowAPMI(hashmap *matrix, const string *reg,
 		const float q_thresh = 7.815,
 		const unsigned short size_thresh = 4) {
@@ -165,7 +164,7 @@ void rowAPMI(hashmap *matrix, const string *reg,
 			mis.clear();
 		}	
 	}
-	return;
+	return mi_vec;
 }
 
 //int main() {

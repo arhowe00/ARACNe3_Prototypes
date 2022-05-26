@@ -9,7 +9,7 @@ using namespace std;
  * e.g. ./ARACNe3 test/regfile.txt test/matrixfile.txt
  */
 int main(int argc, char *argv[]) {
-	bool multithread = true;
+	bool multithread = false;
 	/*
 	 * Multithreading in this application is dynamic and will handle
 	 * computation for each edge MI in parallel.  This is the recommended
@@ -34,6 +34,15 @@ int main(int argc, char *argv[]) {
 				return 0;
 			}
 		}
-	} else {
+	} else if (multithread == false) {
+		ofstream ofs{"output.txt"};
+		auto cout_buff = cout.rdbuf();
+		cout.rdbuf(ofs.rdbuf());
+
+		cout << "REGULATOR\tTARGET\tMI\n";
+		for (auto &reg : regs) {
+			rowAPMI(&matrix, &reg, 7.815, 4);
+		}
+		cout.rdbuf(cout_buff);
 	}
 }
