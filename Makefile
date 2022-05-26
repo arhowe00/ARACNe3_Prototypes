@@ -1,8 +1,9 @@
 CXX = g++
 
-CXXFLAGS = -std=c++11 $(INCLUDES)
+CXXFLAGS = -std=c++20 $(INCLUDES)
 
-INCLUDES = -I/opt/homebrew/lib/R/4.1/site-library/Rcpp/include/ -I/Library/Frameworks/R.framework/Versions/4.1-arm64/Resources/include/
+INCLUDES = 
+#-I/opt/homebrew/lib/R/4.1/site-library/Rcpp/include/ -I/Library/Frameworks/R.framework/Versions/4.1-arm64/Resources/include/
 LDFLAGS = -L/opt/homebrew/Cellar/boost/1.78.0_1/lib/
 LDLIBS = 
 

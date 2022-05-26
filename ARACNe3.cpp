@@ -1,6 +1,7 @@
 #include "ARACNe3.h"
 #include <unistd.h>
 #include <sys/wait.h>
+#include <sys/stat.h>
 
 using namespace std;
 
@@ -13,6 +14,7 @@ using namespace std;
 int main(int argc, char *argv[]) {
 	vector<string> regs = readRegList(string(argv[1]));
 	hashmap matrix = readTransformedGexpMatrix(string(argv[2]));
+	if (mkdir("output", 0777) != 0) return 1;
 	for (auto &reg : regs) {
 		pid_t pid = fork();
 		if (pid == 0) {
