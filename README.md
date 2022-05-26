@@ -17,3 +17,4 @@ modify the Makefile and just run 'make'
 **LIST OF IMPROVEMENTS TO MAKE**
  - Lukas's idea of parallel for loop calculation (opmi something??)
  - More efficient hashmap processing
+ - Changing the node object to a linked list may make indentifying triangles faster
