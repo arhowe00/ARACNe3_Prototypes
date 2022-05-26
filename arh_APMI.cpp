@@ -132,6 +132,42 @@ float APMI(vector<float> vec_x, vector<float> vec_y,
 	return std::accumulate(mis.begin(), mis.end(), static_cast<float>(0.0));
 }
 
+/*
+ * Computes the APMI between a regulator and all targets in the hashmap.  This
+ * function is intended to reduce the number of times the regulator vector is
+ * copied in memory.  It assumes a particular usage case in the ARACNe3.cpp main
+ * function.
+ *
+ * Inputs are the same as above
+ *
+ * It will print the values to the stream
+ */
+
+void rowAPMI(hashmap *matrix, const string *reg,
+		const float q_thresh = 7.815,
+		const unsigned short size_thresh = 4) {
+	// set global variables
+	::size_thresh = size_thresh;
+	::q_thresh = q_thresh;
+	::vec_x = (*matrix)[*reg];
+	::tot_num_pts = vec_x.size();
+	unsigned short all_pts[vec_x.size()];
+	for (unsigned short i = 0; i < tot_num_pts; ++i) { all_pts[i] = i; }	
+	square init{0.0, 0.0, 1.0, all_pts, tot_num_pts};
+
+	for (auto it = matrix->begin(); it != matrix->end(); ++it) {
+		::vec_y = it->second;
+		if (it->first != *reg) {
+			APMI_split(&init);
+			const float mi = std::accumulate(mis.begin(), mis.end(),
+					static_cast<float>(0.0));
+			cout << *reg << "\t" << it->first << "\t" << mi << "\n";
+			mis.clear();
+		}	
+	}
+	return;
+}
+
 //int main() {
 	//vector<float> x = {0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0};
 	//vector<float> y = {0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0};

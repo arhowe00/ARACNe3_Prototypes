@@ -1,3 +1,6 @@
+#include <unistd.h>
+#include <sys/wait.h>
+#include <sys/stat.h>
 #include <vector>
 #include <string>
 #include <unordered_map>
@@ -25,6 +28,8 @@ typedef std::unordered_map<std::string, std::vector<float>> hashmap;
 
 float APMI(std::vector<float>, std::vector<float>, const float q_thresh, 
 		const unsigned short);
+
+void rowAPMI(hashmap *, const std::string *, const float, const unsigned short);
 
 std::vector<std::string> readRegList(std::string);
 
