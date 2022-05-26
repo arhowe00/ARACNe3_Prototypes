@@ -4,7 +4,6 @@
 // LIST OF OPTIMIZATIONS TO BE MADE:
 // Parallel for loop computation (Lukas's Idea)
 
-#include <vector>
 #include <numeric>
 #include <algorithm>
 #include <iostream>
@@ -17,10 +16,12 @@
 using namespace std;
 
 /*
- * Global variables will be modified
+ * Global variables will be modified.  There are many file static variables
+ * here, and so calculating the APMI should invoke this file uniquely, each time
+ * the APMI is calculated, discarding all products.
  */
 static float q_thresh;
-static vector<float> vec_x, vec_y;
+static vector<float> vec_x, vec_y, mis;
 static unsigned short tot_num_pts, size_thresh;
 
 /*
@@ -40,13 +41,13 @@ float calcMI(square *s) {
  *
  * returns nothing; values computed from pointers to original
  */
-void APMI_split(square *s, vector<float> *mis) {
+void APMI_split(square *s) {
 	// extract values; memory disadvantage but runtime advantage
 	const float x_bound1=s->x_bound1, y_bound1=s->y_bound1, width=s->width;
 	const unsigned short *pts=s->pts, num_pts=s->num_pts;
 
 	// if we have less points in the square than size_thresh, calc MI
-	if (num_pts < size_thresh) {mis->push_back(calcMI(s)); return;}
+	if (num_pts < size_thresh) {mis.push_back(calcMI(s)); return;}
 
 	// thresholds for potential partition of XY plane
 	const float x_thresh = x_bound1 + width/2.0, 
@@ -84,13 +85,13 @@ void APMI_split(square *s, vector<float> *mis) {
 		       bl{x_bound1, y_bound1, width/2, bl_pts, bl_num_pts}, 
 		       tl{x_bound1, y_thresh, width/2, tl_pts, tl_num_pts};
 
-		APMI_split(&tr, mis);
-		APMI_split(&br, mis);
-		APMI_split(&bl, mis);
-		APMI_split(&tl, mis);
+		APMI_split(&tr);
+		APMI_split(&br);
+		APMI_split(&bl);
+		APMI_split(&tl);
 	} else {
 		// if we don't partition, then we calc MI
-		mis->push_back(calcMI(s));
+		mis.push_back(calcMI(s));
 	}
 
 	return;
@@ -123,8 +124,7 @@ vector<float> APMI(vector<float> vec_x, vector<float> vec_y,
 
 	// Initialize plane and calc all MIs
 	square init{0.0, 0.0, 1.0, all_pts, tot_num_pts};	
-	vector<float> mis;
-	APMI_split(&init, &mis);
+	APMI_split(&init);
 
 	return mis;
 }

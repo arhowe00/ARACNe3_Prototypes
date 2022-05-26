@@ -1,4 +1,6 @@
 #include <vector>
+#include <string>
+#include <unordered_map>
 
 #ifndef _ARACNE3_H_
 #define _ARACNE3_H_
@@ -13,6 +15,11 @@
  */
 typedef struct {const float x_bound1, y_bound1, width; 
 	const unsigned short *pts, num_pts;} square;
+
+/*
+ * Easier type to work with
+ */
+typedef std::unordered_map<std::string, std::vector<float>> hashmap;
 
 std::vector<float> APMI(std::vector<float>, std::vector<float>, const float, 
 		const unsigned short);
