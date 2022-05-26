@@ -13,3 +13,9 @@ and will just append to the previous file
 Lukas, if you are having issues with compatability and running the executable
 just recompile all cpp files and link ARACNe3 with them.  You might be able to
 modify the Makefile and just run 'make'
+
+
+**LIST OF IMPROVEMENTS TO MAKE**
+ - Calculating ROW-APMI, or not having to copy vec_x many many times
+ - Lukas's idea of parallel for loop calculation (opmi something??)
+ - More efficient hashmap processing
