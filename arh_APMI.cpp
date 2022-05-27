@@ -164,7 +164,7 @@ void rowAPMI(hashmap *matrix, const string *reg,
 			mis.clear();
 		}	
 	}
-	return mi_vec;
+	return;
 }
 
 //int main() {
