@@ -4,19 +4,15 @@
 // LIST OF OPTIMIZATIONS TO BE MADE:
 // Parallel for loop computation (Lukas's Idea)
 
-#include <numeric>
-#include <algorithm>
-#include <iostream>
-#include <math.h>
 //#include <boost/math/distributions/chi_squared.hpp>
 //#include <Rcpp.h>
-#include "ARACNe3.h"
+#include "ARACNe3.hpp"
 
 //using namespace Rcpp;
 using namespace std;
 
 /*
- * Global variables will be modified.  There are many file static variables
+ * File static  variables will be modified.  There are many file static variables
  * here, and so calculating the APMI should invoke this file uniquely, each time
  * the APMI is calculated, discarding all products.
  */
@@ -131,19 +127,18 @@ float APMI(vector<float> vec_x, vector<float> vec_y,
 	return std::accumulate(mis.begin(), mis.end(), static_cast<float>(0.0));
 }
 
-/*
- * Computes the APMI between a regulator and all targets in the hashmap.  This
+
+/* Computes the APMI between a regulator and all targets in the hashmap.  This
  * function is intended to reduce the number of times the regulator vector is
  * passed in memory, with the advance knowledge that we need to use the same
  * vec_x many times.  It assumes a particular usage case in the ARACNe3.cpp main
  * function.  
- *
+ * 
  * Inputs are the entire hashmap of gene->expression, the regulator name, and
  * then the q_thresh and size_thresh same as above
- *
+ * 
  * Returns a vector of 'edge' structs corresponding to each edge and their MI.
  */
-
 void hashmapAPMI(hashmap &matrix, const string &reg,
 		const float q_thresh = 7.815,
 		const unsigned short size_thresh = 4) {
@@ -186,7 +181,7 @@ void hashmapAPMI(hashmap &matrix, const string &reg,
  * returns a float vector of targets.size() MI values, in the order of 'targets'
  */
 
-const vector<const float> permuteAPMI(const vector<float> &ref, const
+const vector<const float> permuteAPMI(vector<float> &ref, 
 		vector<vector<float>> &targets, const float q_thresh
 		= 7.815, const unsigned short size_thresh = 4) {
 	// set file static variables
@@ -209,15 +204,14 @@ const vector<const float> permuteAPMI(const vector<float> &ref, const
 		mis.clear();
 	}
 
-	const vector<const float> mi_vec(&mi_array[0],
-			&mi_array[targets.size()]);
+	const vector<const float> mi_vec(&mi_array[0], &mi_array[targets.size()]);
 	return mi_vec;
 }
 
-//int main() {
+int main() {
 	//vector<float> x = {0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0};
 	//vector<float> y = {0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0};
 	//vector<float> mis = APMI(x,y);
 	//for (auto mi : mis) {cout << mi << endl;}
-	//return 0;
-//}
+	return 0;
+}

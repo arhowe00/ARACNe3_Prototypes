@@ -6,9 +6,13 @@
 #include <unordered_map>
 #include <iostream>
 #include <fstream>
+#include <algorithm>
+#include <random>
+#include <numeric>
+#include <math.h>
 
-#ifndef _ARACNE3_H_
-#define _ARACNE3_H_
+#ifndef _ARACNE3_HPP_
+#define _ARACNE3_HPP_
 
 /*
  * Square struct for APMI estimator.
@@ -41,10 +45,17 @@ typedef std::unordered_map<std::string, std::vector<float>> hashmap;
 float APMI(std::vector<float>, std::vector<float>, const float q_thresh, 
 		const unsigned short);
 
-void hashmapAPMI(hashmap &, const std::string &, const float, const unsigned short);
+void hashmapAPMI(hashmap &, const std::string &, const float, const unsigned
+		short);
+
+const std::vector<const float> permuteAPMI(std::vector<float> &, 
+		std::vector<std::vector<float>> &, const float,
+		const unsigned short);
+
+
 
 std::vector<std::string> readRegList(std::string);
 
 hashmap readTransformedGexpMatrix(std::string);
 
-#endif /* #ifndef _ARACNE3_H_ */
+#endif /* #ifndef _ARACNE3_HPP_ */

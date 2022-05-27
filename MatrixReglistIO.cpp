@@ -1,6 +1,4 @@
-#include "ARACNe3.h"
-#include <iostream>
-#include <fstream>
+#include "ARACNe3.hpp"
 
 using namespace std;
 

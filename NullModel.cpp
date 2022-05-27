@@ -1,4 +1,4 @@
-#include "ARACNe3.h"
+#include "ARACNe3.hpp"
 
 /*
  * This file is the null-model module of ARACNe3.  It is a separate file because
@@ -11,13 +11,39 @@
  *
  */
 
-vector<float> *null_mis;
+std::vector<float> *null_mis;
 
 /*
  * Computes 1 million null mutual information values from the number of samples.
  * To reduce runtime, we emulate rowAPMI but 
  */
-vector<float> initNullMIs(const unsigned short &tot_num_samps) {
+std::vector<float> initNullMIs(const unsigned int &tot_num_samps) {
 	// make the permute vector, the ref vector, send to permuteAPMI
-	//
+	float ref_arr[tot_num_samps];
+	for (unsigned short i = 0; i < tot_num_samps; ref_arr[i++] =
+			i/((float) tot_num_samps));
+	std::vector<float> ref_vec(&ref_arr[0], &ref_arr[tot_num_samps]);
+
+	// an array of vectors
+	std::vector<float> target_arr[1000000];
+
+	auto rng = std::default_random_engine {};
+	for (unsigned int i = 0; i < 1000000; ++i) {
+		target_arr[i] = std::vector<float>(ref_vec);
+		std::shuffle(std::begin(target_arr[i]), std::end(target_arr[i]),
+				rng);
+	}
+
+	std::vector<std::vector<float>> target_vec(&target_arr[0],
+			&target_arr[1000000]);
+
+
+
+	return ref_vec;
+}
+
+int main() {
+	std::vector<float> ref = initNullMIs(100U);
+	for (auto &num : ref) { std::cout << num << std::endl; }
+	return 0;
 }
