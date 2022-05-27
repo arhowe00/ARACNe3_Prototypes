@@ -48,9 +48,11 @@ float APMI(std::vector<float>, std::vector<float>, const float q_thresh,
 void hashmapAPMI(hashmap &, const std::string &, const float, const unsigned
 		short);
 
-const std::vector<const float> permuteAPMI(std::vector<float> &, 
-		std::vector<std::vector<float>> &, const float,
+std::vector<float> permuteAPMI(std::vector<float> &ref_vec, 
+		std::vector<std::vector<float>> &target_vec, const float,
 		const unsigned short);
+
+std::vector<float> initNullMis(const unsigned int);
 
 
 
