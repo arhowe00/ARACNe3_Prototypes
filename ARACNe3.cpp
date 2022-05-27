@@ -9,7 +9,7 @@ using namespace std;
  * e.g. ./ARACNe3 test/regfile.txt test/matrixfile.txt
  */
 int main(int argc, char *argv[]) {
-	bool multithread = false;
+	bool multithread = true;
 	/*
 	 * Multithreading in this application is dynamic and will handle
 	 * computation for each edge MI in parallel.  This is the recommended

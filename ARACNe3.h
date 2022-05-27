@@ -18,8 +18,13 @@
  * 'pts' is an array of indices
  * 'num_pts' is the size of 'pts'
  */
-typedef struct {const float x_bound1, y_bound1, width; 
-	const unsigned short *pts, num_pts;} square;
+typedef struct {const float &x_bound1, &y_bound1, &width; 
+	const unsigned short *pts, &num_pts;} square;
+
+/*
+ * Edge struct for regulator->target interactions.  
+ */
+typedef struct {;} edge;
 
 /*
  * Easier type to work with

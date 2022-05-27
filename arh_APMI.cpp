@@ -27,8 +27,8 @@ static unsigned short tot_num_pts, size_thresh;
 /*
  * Calculate the MI for a square struct
  */
-float calcMI(square *s) {
-	const float pxy = s->num_pts/(float)tot_num_pts, marginal = s->width;
+float calcMI(square &s) {
+	const float pxy = s.num_pts/(float)tot_num_pts, marginal = s.width;
 	float mi;
 	return isfinite(mi = pxy*log(pxy/marginal/marginal)) ? mi : 0.0;
 }
@@ -41,10 +41,10 @@ float calcMI(square *s) {
  *
  * returns nothing; values computed from pointers to original
  */
-void APMI_split(square *s) {
+void APMI_split(square &s) {
 	// extract values; memory disadvantage but runtime advantage
-	const float x_bound1=s->x_bound1, y_bound1=s->y_bound1, width=s->width;
-	const unsigned short *pts=s->pts, num_pts=s->num_pts;
+	const float x_bound1=s.x_bound1, y_bound1=s.y_bound1, width=s.width;
+	const unsigned short *pts=s.pts, num_pts=s.num_pts;
 
 	// if we have less points in the square than size_thresh, calc MI
 	if (num_pts < size_thresh) {mis.push_back(calcMI(s)); return;}
@@ -70,7 +70,6 @@ void APMI_split(square *s) {
 		else if (top) { tl_pts[tl_num_pts++] = p; } 
 		else { bl_pts[bl_num_pts++] = p; }
 	}
-	
 
 	// compute chi-square, more efficient not to use pow()
 	const float E = num_pts / 4.0, chisq = ((tr_num_pts-E)*(tr_num_pts-E) +
@@ -85,10 +84,10 @@ void APMI_split(square *s) {
 		       bl{x_bound1, y_bound1, width/2, bl_pts, bl_num_pts}, 
 		       tl{x_bound1, y_thresh, width/2, tl_pts, tl_num_pts};
 
-		APMI_split(&tr);
-		APMI_split(&br);
-		APMI_split(&bl);
-		APMI_split(&tl);
+		APMI_split(tr);
+		APMI_split(br);
+		APMI_split(bl);
+		APMI_split(tl);
 	} else {
 		// if we don't partition, then we calc MI
 		mis.push_back(calcMI(s));
@@ -127,7 +126,7 @@ float APMI(vector<float> vec_x, vector<float> vec_y,
 
 	// Initialize plane and calc all MIs
 	square init{0.0, 0.0, 1.0, all_pts, tot_num_pts};	
-	APMI_split(&init);
+	APMI_split(init);
 
 	return std::accumulate(mis.begin(), mis.end(), static_cast<float>(0.0));
 }
@@ -135,13 +134,15 @@ float APMI(vector<float> vec_x, vector<float> vec_y,
 /*
  * Computes the APMI between a regulator and all targets in the hashmap.  This
  * function is intended to reduce the number of times the regulator vector is
- * copied in memory.  It assumes a particular usage case in the ARACNe3.cpp main
- * function.
+ * passed in memory, with the advance knowledge that we need to use the same
+ * vec_x many times.  It assumes a particular usage case in the ARACNe3.cpp main
+ * function.  
  *
  * Inputs are the same as above
  *
  * It will print the values to the stream
  */
+
 void rowAPMI(hashmap &matrix, const string &reg,
 		const float q_thresh = 7.815,
 		const unsigned short size_thresh = 4) {
@@ -150,14 +151,18 @@ void rowAPMI(hashmap &matrix, const string &reg,
 	::q_thresh = q_thresh;
 	::vec_x = matrix[reg];
 	::tot_num_pts = vec_x.size();
-	unsigned short all_pts[vec_x.size()];
+	unsigned short all_pts[tot_num_pts];
 	for (unsigned short i = 0; i < tot_num_pts; ++i) { all_pts[i] = i; }	
 	square init{0.0, 0.0, 1.0, all_pts, tot_num_pts};
 
-	for (auto it = matrix.begin(); it != matrix.end(); ++it) {
+	// we use array and vectorize later; runtime advantage
+	//float (const rowMI_arr)[tot_num_pts];
+
+	for (auto it = matrix.begin(); it != matrix.end();
+			++it) {
 		::vec_y = it->second;
 		if (it->first != reg) {
-			APMI_split(&init);
+			APMI_split(init);
 			const float mi = std::accumulate(mis.begin(), mis.end(),
 					static_cast<float>(0.0));
 			cout << reg << "\t" << it->first << "\t" << mi << "\n";
