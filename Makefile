@@ -7,21 +7,21 @@ LDFLAGS = -L/opt/homebrew/Cellar/boost/1.78.0_1/lib/
 LDLIBS = 
 
 
-ARACNe3: arh_APMI.o arh_MatrixReglistIO.o
+ARACNe3: APMI.o MatrixReglistIO.o
 
-arh_APMI.o:
+APMI.o:
 
-arh_MatrixReglistIO.o:
+MatrixReglistIO.o:
 
 
-arh_APMI: 
+APMI: 
 
-arh_MatrixReglistIO:
+MatrixReglistIO:
 
 
 .PHONY: all
-all: arh_ARACNe3 arh_APMI arh_MatrixReglistIO
+all: ARACNe3 APMI MatrixReglistIO
 
 .PHONY: clean
 clean: 
-	rm *.o arh_APMI arh_MatrixReglistIO
+	rm *.o APMI MatrixReglistIO

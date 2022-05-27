@@ -110,7 +110,7 @@ void APMI_split(square &s) {
 float APMI(vector<float> vec_x, vector<float> vec_y, 
 		const float q_thresh = 7.815, 
 		const unsigned short size_thresh = 4) {
-	// Set global variables
+	// Set file static variables
 	::size_thresh = size_thresh;
 	::q_thresh = q_thresh;
 	::vec_x = vec_x;
@@ -138,15 +138,16 @@ float APMI(vector<float> vec_x, vector<float> vec_y,
  * vec_x many times.  It assumes a particular usage case in the ARACNe3.cpp main
  * function.  
  *
- * Inputs are the same as above
+ * Inputs are the entire hashmap of gene->expression, the regulator name, and
+ * then the q_thresh and size_thresh same as above
  *
- * It will print the values to the stream
+ * Returns a vector of 'edge' structs corresponding to each edge and their MI.
  */
 
-void rowAPMI(hashmap &matrix, const string &reg,
+void hashmapAPMI(hashmap &matrix, const string &reg,
 		const float q_thresh = 7.815,
 		const unsigned short size_thresh = 4) {
-	// set global variables
+	// set file static variables
 	::size_thresh = size_thresh;
 	::q_thresh = q_thresh;
 	::vec_x = matrix[reg];
@@ -170,6 +171,47 @@ void rowAPMI(hashmap &matrix, const string &reg,
 		}	
 	}
 	return;
+}
+
+/*
+ * Computes the MI for a reference vector ref and a vector of vector targets.
+ * Similar to hashmapAPMI, but faster run time and used when creating edge
+ * structs is not necessary, i.e. when computing 1 million null MI values.
+ *
+ * ref is the vector that will be referenced for all MI calculations
+ * targets is a vector of vectors that we permute with ref
+ * q_thresh is the chi-squared independence threshold
+ * size_thresh is the smallest number of points allowed in a partition
+ *
+ * returns a float vector of targets.size() MI values, in the order of 'targets'
+ */
+
+const vector<const float> permuteAPMI(const vector<float> &ref, const
+		vector<vector<float>> &targets, const float q_thresh
+		= 7.815, const unsigned short size_thresh = 4) {
+	// set file static variables
+	::size_thresh = size_thresh;
+	::q_thresh = q_thresh;
+	::vec_x = ref;
+	::tot_num_pts = ref.size();
+
+	float mi_array[targets.size()];
+
+	unsigned short all_pts[tot_num_pts];
+	for (unsigned short i = 0; i < tot_num_pts; ++i) { all_pts[i] = i; }
+	square init{0.0, 0.0, 1.0, all_pts, tot_num_pts};
+
+	for (unsigned int i = 0; i < targets.size(); ++i) {
+		::vec_y = targets[i];
+		APMI_split(init);
+		mi_array[i] = std::accumulate(mis.begin(), mis.end(),
+				static_cast<float>(0.0));
+		mis.clear();
+	}
+
+	const vector<const float> mi_vec(&mi_array[0],
+			&mi_array[targets.size()]);
+	return mi_vec;
 }
 
 //int main() {

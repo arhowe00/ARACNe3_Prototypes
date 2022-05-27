@@ -28,7 +28,7 @@ int main(int argc, char *argv[]) {
 				auto cout_buff = cout.rdbuf();
 				cout.rdbuf(ofs.rdbuf());
 				
-				rowAPMI(matrix, reg, 7.815, 4);
+				hashmapAPMI(matrix, reg, 7.815, 4);
 
 				cout.rdbuf(cout_buff);
 				return 0;
@@ -41,7 +41,7 @@ int main(int argc, char *argv[]) {
 
 		cout << "REGULATOR\tTARGET\tMI\n";
 		for (auto &reg : regs) {
-			rowAPMI(matrix, reg, 7.815, 4);
+			hashmapAPMI(matrix, reg, 7.815, 4);
 		}
 		cout.rdbuf(cout_buff);
 	}

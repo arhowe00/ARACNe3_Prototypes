@@ -24,7 +24,14 @@ typedef struct {const float &x_bound1, &y_bound1, &width;
 /*
  * Edge struct for regulator->target interactions.  
  */
-typedef struct {;} edge;
+typedef struct {const std::string &regulator, &target;
+	const float mi;} edge;
+
+/*
+ * Edge struct for regulator->target interactions, with incorporated p-values.
+ * This struct is only used when we are doing the first-round pruning step
+ */
+typedef struct {edge &edge; const float p_value;} edge_p;
 
 /*
  * Easier type to work with
@@ -34,7 +41,7 @@ typedef std::unordered_map<std::string, std::vector<float>> hashmap;
 float APMI(std::vector<float>, std::vector<float>, const float q_thresh, 
 		const unsigned short);
 
-void rowAPMI(hashmap &, const std::string &, const float, const unsigned short);
+void hashmapAPMI(hashmap &, const std::string &, const float, const unsigned short);
 
 std::vector<std::string> readRegList(std::string);
 
