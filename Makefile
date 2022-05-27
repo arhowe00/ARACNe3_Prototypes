@@ -8,6 +8,7 @@ LDLIBS =
 
 
 ARACNe3: arh_APMI.o arh_MatrixReglistIO.o
+	rm *.o
 
 arh_APMI.o:
 

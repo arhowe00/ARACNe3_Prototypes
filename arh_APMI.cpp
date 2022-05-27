@@ -142,25 +142,25 @@ float APMI(vector<float> vec_x, vector<float> vec_y,
  *
  * It will print the values to the stream
  */
-void rowAPMI(hashmap *matrix, const string *reg,
+void rowAPMI(hashmap &matrix, const string &reg,
 		const float q_thresh = 7.815,
 		const unsigned short size_thresh = 4) {
 	// set global variables
 	::size_thresh = size_thresh;
 	::q_thresh = q_thresh;
-	::vec_x = (*matrix)[*reg];
+	::vec_x = matrix[reg];
 	::tot_num_pts = vec_x.size();
 	unsigned short all_pts[vec_x.size()];
 	for (unsigned short i = 0; i < tot_num_pts; ++i) { all_pts[i] = i; }	
 	square init{0.0, 0.0, 1.0, all_pts, tot_num_pts};
 
-	for (auto it = matrix->begin(); it != matrix->end(); ++it) {
+	for (auto it = matrix.begin(); it != matrix.end(); ++it) {
 		::vec_y = it->second;
-		if (it->first != *reg) {
+		if (it->first != reg) {
 			APMI_split(&init);
 			const float mi = std::accumulate(mis.begin(), mis.end(),
 					static_cast<float>(0.0));
-			cout << *reg << "\t" << it->first << "\t" << mi << "\n";
+			cout << reg << "\t" << it->first << "\t" << mi << "\n";
 			mis.clear();
 		}	
 	}
