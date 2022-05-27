@@ -11,25 +11,22 @@
  *
  */
 
-//std::vector<float> *null_mis;
+static std::vector<float> *null_mis;
 
 /*
  * Computes 1 million null mutual information values from the number of samples.
  * To reduce runtime, we emulate rowAPMI but 
  */
-std::vector<float> initNullMIs(const unsigned int tot_num_samps) {
+const std::vector<const float> initNullMIs(int tot_num_samps) {
 	// make the permute vector, the ref vector, send to permuteAPMI
-	std::cout << "TEST" << std::endl;
 	float ref_arr[tot_num_samps];
 	for (unsigned short i = 0; i < tot_num_samps; ++i) {
-		ref_arr[i] = i/(float) tot_num_samps;
+		ref_arr[i] = ((float) i)/tot_num_samps;
 	}
-	std::cout << "TEST" << std::endl;
 	std::vector<float> ref_vec(&ref_arr[0], &ref_arr[tot_num_samps]);
 
-	// an array of vectors
-	std::vector<float> target_arr[1000000];
-	std::cout << "TEST" << std::endl;
+	// an array of vectors, pointer on stack; array on heap
+	std::vector<float> *target_arr = new std::vector<float>[1000000];
 
 	auto rng = std::default_random_engine {};
 	for (unsigned int i = 0; i < 1000000; ++i) {
@@ -37,19 +34,21 @@ std::vector<float> initNullMIs(const unsigned int tot_num_samps) {
 		std::shuffle(std::begin(target_arr[i]), std::end(target_arr[i]),
 				rng);
 	}
-	std::cout << "TEST" << std::endl;
 
+	// vector is now on heap
 	std::vector<std::vector<float>> target_vec(&target_arr[0],
 			&target_arr[1000000]);
-	std::cout << "TEST" << std::endl;
 
-	//std::vector<float> mi_vec = permuteAPMI(ref_vec, target_vec,
-	//		7.815, 4);
+	delete[] target_arr;
 
-	return ref_vec;
+	const std::vector<const float> mi_vec = permuteAPMI(ref_vec, target_vec,
+			7.815, 4);
+
+	return mi_vec;
 }
 
 int main() {
-	std::vector<float> mis = initNullMIs(100);
-	for (auto &num : mis) { std::cout << num << std::endl; }
+	const std::vector<const float> mis = initNullMIs(100);
+	//for (auto &num : mis) { std::cerr << num << std::endl; }
+	return 0;
 }

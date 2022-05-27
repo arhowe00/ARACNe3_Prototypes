@@ -208,10 +208,10 @@ const vector<const float> permuteAPMI(vector<float> &ref,
 	return mi_vec;
 }
 
-int main() {
+//int main() {
 	//vector<float> x = {0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0};
 	//vector<float> y = {0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0};
 	//vector<float> mis = APMI(x,y);
 	//for (auto mi : mis) {cout << mi << endl;}
-	return 0;
-}
+//	return 0;
+//}

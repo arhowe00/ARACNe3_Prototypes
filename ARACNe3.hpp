@@ -1,15 +1,15 @@
-#include <unistd.h>
-#include <sys/wait.h>
-#include <sys/stat.h>
+//#include <unistd.h>
+//#include <sys/wait.h>
+//#include <sys/stat.h>
 #include <vector>
-#include <string>
+//#include <string>
 #include <unordered_map>
 #include <iostream>
-#include <fstream>
-#include <algorithm>
+//#include <fstream>
+//#include <algorithm>
 #include <random>
-#include <numeric>
-#include <math.h>
+//#include <numeric>
+//#include <math.h>
 
 #ifndef _ARACNE3_HPP_
 #define _ARACNE3_HPP_
@@ -48,7 +48,7 @@ float APMI(std::vector<float>, std::vector<float>, const float q_thresh,
 void hashmapAPMI(hashmap &, const std::string &, const float, const unsigned
 		short);
 
-std::vector<float> permuteAPMI(std::vector<float> &ref_vec, 
+const std::vector<const float> permuteAPMI(std::vector<float> &ref_vec, 
 		std::vector<std::vector<float>> &target_vec, const float,
 		const unsigned short);
 
