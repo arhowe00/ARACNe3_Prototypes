@@ -19,30 +19,28 @@ static std::vector<float> *null_mis;
  */
 const std::vector<const float> initNullMIs(int tot_num_samps) {
 	// make the permute vector, the ref vector, send to permuteAPMI
-	float ref_arr[tot_num_samps];
-	for (unsigned short i = 0; i < tot_num_samps; ++i) {
-		ref_arr[i] = ((float) i)/tot_num_samps;
+	std::vector<float> ref_vec;
+	ref_vec.reserve(tot_num_samps);
+	for (unsigned short i = 1; i <= tot_num_samps; ++i) {
+		ref_vec.push_back(((float) i)/(tot_num_samps+1));
 	}
-	std::vector<float> ref_vec(&ref_arr[0], &ref_arr[tot_num_samps]);
 
 	// an array of vectors, pointer on stack; array on heap
-	std::vector<float> *target_arr = new std::vector<float>[1000000];
+	std::vector<std::vector<float>> target_vec;
+	target_vec.reserve(1000000);
 
 	auto rng = std::default_random_engine {};
 	for (unsigned int i = 0; i < 1000000; ++i) {
-		target_arr[i] = std::vector<float>(ref_vec);
-		std::shuffle(std::begin(target_arr[i]), std::end(target_arr[i]),
+		target_vec.emplace_back(std::vector<float>(ref_vec));
+		std::shuffle(std::begin(target_vec[i]), std::end(target_vec[i]),
 				rng);
 	}
 
 	// vector is now on heap
-	std::vector<std::vector<float>> target_vec(&target_arr[0],
-			&target_arr[1000000]);
-
-	delete[] target_arr;
-
 	const std::vector<const float> mi_vec = permuteAPMI(ref_vec, target_vec,
 			7.815, 4);
+
+	// NEXT -> Sort vector largest to smallest and output.  
 
 	return mi_vec;
 }
