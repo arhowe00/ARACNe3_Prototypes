@@ -1,6 +1,6 @@
 # ARACNe3
 
-## ARACNe3 (Algorithm for the Accurate Reconstruction of Cellular Networks v. 3)
+## ARACNe3 (Algorithm for the Reconstruction of Accurate Cellular Networks ver. 3)
 
 This is a prototype of the C++ implementation of ARACNe3 currently under
 development.  ARACNe3 presents multiple computational and theoretical
