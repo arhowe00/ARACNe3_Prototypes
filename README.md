@@ -38,3 +38,21 @@ system.
 most efficient data structures required to store edge information (hashmaps,
 linked lists, adjacency matrices, etc.)
 
+## Tracking Progress
+
+Whenever a significant change is made to an existing module of this program,
+such as MatrixReglistIO.cpp for reading tsv or regulator lists and forming data
+structures, or NullModel.cpp for creating the null distribution for Mutual
+Information, test results are appended to test/current\_test.txt.  The results
+reflect the command run on the most recent version of the given executable, such
+as ./NullModel for testing computation of the null model for MI.  Tests were run
+on the following computer, and the 'time' program was released in MacOS 12.3 as
+a utility expected to conform to ISO/IEC 9945-2:1993.  Please refer to the MacOS
+man pages for details in regards to 'time'.
+
+Model Identifier:	MacBookPro18,1
+Chip:	Apple M1 Pro
+Total Number of Cores:	10 (8 performance and 2 efficiency)
+Memory:	32 GB
+System Firmware Version:	7459.101.3
+OS Loader Version:	7459.101.3
