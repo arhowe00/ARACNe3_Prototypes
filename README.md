@@ -1,20 +1,40 @@
-***ARACNe3 prototypes***
+# ARACNe3
 
-Currently, to use the executable type
+## ARACNe3 (Algorithm for the Accurate Reconstruction of Cellular Networks v. 3)
 
-./ARACNe3 /path/to/regulators.txt /path/to/gexpmatrix.txt
+This is a prototype of the C++ implementation of ARACNe3 currently under
+development.  ARACNe3 presents multiple computational and theoretical
+improvements to the existing ARACNe-AP algorithm formulated in Java.  
 
-in the commandline.  The program will CURRENTLY output a directory 'output/' 
-that contains the regulator-target MI values.  
+Please contact Aaron T. Griffin and Lukas J. Vlahos for any questions in regards
+to this project.
 
-If running this again, DELETE 'output/', as this is a very primitive program
+Aaron T. Griffin - atg2142@cumc.columbia.edu Lukas J. Vlahos -
+lv2395@cumc.columbia.edu 
 
-Lukas, if you are having issues with compatability and running the executable
-just recompile all cpp files and link ARACNe3 with them.  You might be able to
-modify the Makefile and just run 'make'
+## Running the Most Recent Executable
 
+This codebase is currently under development, but the most up-to-date ARACNe3
+executable can still be run using the following commandline arguments: ./ARACNe3
+/path/to/regulators.txt /path/to/gexpmatrix.txt
 
-**LIST OF IMPROVEMENTS TO MAKE**
- - Lukas's idea of parallel for loop calculation (opmi something??)
- - More efficient hashmap processing
- - Changing the node object to a linked list may make indentifying triangles faster
+The program will CURRENTLY output a directory 'output/' that contains the
+regulator-target MI values estimated via Adaptive Partitioning (APMI).  
+
+To run this multiple times, DELETE 'output/', as this is a primitive program and
+will append to the previous directory.
+
+It may be the case that this executable is only operable on MacOS 12.3.1 arm64
+devices.  C++ files may be recompiled to operate on any UNIX-based operating
+system.  
+
+## List of Improvements in Development:
+ - **IN PROGRESS** Multithreading/non-multithreading option via commandline 
+ - **IN PROGRESS** First MI-pruning step based on null model for MI and
+   Benjamini-Hochberg principle control for user-parametrizable FDR. 
+ - Second DPI-pruning step made optional and implemented
+ - **IN PROGRESS** Low-level optimization and parallel for loop processing.
+   Namely, minimizing heap allocation and using caches, as well as using the
+most efficient data structures required to store edge information (hashmaps,
+linked lists, adjacency matrices, etc.)
+
