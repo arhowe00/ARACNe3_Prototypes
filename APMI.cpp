@@ -23,7 +23,7 @@ static unsigned short tot_num_pts, size_thresh;
 /*
  * Calculate the MI for a square struct
  */
-float calcMI(square &s) {
+float calcMI(const square &s) {
 	const float pxy = s.num_pts/(float)tot_num_pts, marginal = s.width;
 	float mi;
 	return isfinite(mi = pxy*log(pxy/marginal/marginal)) ? mi : 0.0;
@@ -37,7 +37,7 @@ float calcMI(square &s) {
  *
  * returns nothing; values computed from pointers to original
  */
-void APMI_split(square &s) {
+void APMI_split(const square &s) {
 	// extract values; memory disadvantage but runtime advantage
 	const float x_bound1=s.x_bound1, y_bound1=s.y_bound1, width=s.width;
 	const unsigned short *pts=s.pts, num_pts=s.num_pts;
@@ -75,7 +75,7 @@ void APMI_split(square &s) {
 
 	// partition if chi-square or if initial square
 	if (chisq > q_thresh || num_pts == tot_num_pts) {
-		square tr{x_thresh, y_thresh, width/2, tr_pts, tr_num_pts}, 
+		const square tr{x_thresh, y_thresh, width/2, tr_pts, tr_num_pts}, 
 		       br{x_thresh, y_bound1, width/2, br_pts, br_num_pts}, 
 		       bl{x_bound1, y_bound1, width/2, bl_pts, bl_num_pts}, 
 		       tl{x_bound1, y_thresh, width/2, tl_pts, tl_num_pts};
@@ -119,9 +119,9 @@ float APMI(vector<float> vec_x, vector<float> vec_y,
 	// Make an array of all indices, to be partitioned later
 	unsigned short all_pts[vec_x.size()];
 	for (unsigned short i = 0; i < tot_num_pts; i++) { all_pts[i] = i; }
-
+	
 	// Initialize plane and calc all MIs
-	square init{0.0, 0.0, 1.0, all_pts, tot_num_pts};	
+	const square init{0.0, 0.0, 1.0,  all_pts, tot_num_pts};	
 	APMI_split(init);
 
 	return std::accumulate(mis.begin(), mis.end(), static_cast<float>(0.0));
@@ -149,7 +149,7 @@ void hashmapAPMI(hashmap &matrix, const string &reg,
 	::tot_num_pts = vec_x.size();
 	unsigned short all_pts[tot_num_pts];
 	for (unsigned short i = 0; i < tot_num_pts; ++i) { all_pts[i] = i; }	
-	square init{0.0, 0.0, 1.0, all_pts, tot_num_pts};
+	const square init{0.0, 0.0, 1.0,  all_pts, tot_num_pts};
 
 	// we use array and vectorize later; runtime advantage
 	//float (const rowMI_arr)[tot_num_pts];
@@ -194,7 +194,7 @@ const vector<const float> permuteAPMI(vector<float> &ref,
 
 	unsigned short all_pts[tot_num_pts];
 	for (unsigned short i = 0; i < tot_num_pts; ++i) { all_pts[i] = i; }
-	square init{0.0, 0.0, 1.0, all_pts, tot_num_pts};
+	const square init{0.0, 0.0, 1.0,  all_pts, tot_num_pts};
 
 	for (unsigned int i = 0; i < targets.size(); ++i) {
 		::vec_y = targets[i];
@@ -208,10 +208,10 @@ const vector<const float> permuteAPMI(vector<float> &ref,
 	return mi_vec;
 }
 
-//int main() {
-	//vector<float> x = {0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0};
-	//vector<float> y = {0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0};
-	//vector<float> mis = APMI(x,y);
-	//for (auto mi : mis) {cout << mi << endl;}
-//	return 0;
-//}
+int main() {
+	vector<float> x = {0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0};
+	vector<float> y = {0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0};
+	const float mi = APMI(x,y);
+	cout << mi << endl;
+	return 0;
+}

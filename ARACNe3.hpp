@@ -23,7 +23,7 @@
  * 'num_pts' is the size of 'pts'
  */
 typedef struct {const float &x_bound1, &y_bound1, &width; 
-	const unsigned short *pts, &num_pts;} square;
+	unsigned short *pts, &num_pts;} square;
 
 /*
  * Edge struct for regulator->target interactions.  
