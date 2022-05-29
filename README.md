@@ -6,17 +6,17 @@ This is a prototype of the C++ implementation of ARACNe3 currently under
 development.  ARACNe3 presents multiple computational and theoretical
 improvements to the existing ARACNe-AP algorithm formulated in Java.  
 
-Please contact Aaron T. Griffin and Lukas J. Vlahos for any questions in regards
-to this project.
+Please contact Aaron T. Griffin and Lukas J. Vlahos for any questions regarding this project.
 
-Aaron T. Griffin - atg2142@cumc.columbia.edu Lukas J. Vlahos -
-lv2395@cumc.columbia.edu 
+Aaron T. Griffin - atg2142@cumc.columbia.edu 
+Lukas J. Vlahos - lv2395@cumc.columbia.edu 
 
 ## Running the Most Recent Executable
 
 This codebase is currently under development, but the most up-to-date ARACNe3
-executable can still be run using the following commandline arguments: ./ARACNe3
-/path/to/regulators.txt /path/to/gexpmatrix.txt
+executable can still be run using the following commandline arguments: 
+
+./ARACNe3 /path/to/regulators.txt /path/to/gexpmatrix.txt
 
 The program will CURRENTLY output a directory 'output/' that contains the
 regulator-target MI values estimated via Adaptive Partitioning (APMI).  
