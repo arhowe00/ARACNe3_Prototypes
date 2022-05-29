@@ -21,7 +21,7 @@ const std::vector<const float> initNullMIs(int tot_num_samps) {
 	// make the permute vector, the ref vector, send to permuteAPMI
 	std::vector<float> ref_vec;
 	ref_vec.reserve(tot_num_samps);
-	for (unsigned short i = 1; i <= tot_num_samps; ++i) {
+	for (uint16_t i = 1; i <= tot_num_samps; ++i) {
 		ref_vec.push_back(((float) i)/(tot_num_samps+1));
 	}
 

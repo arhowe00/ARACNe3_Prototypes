@@ -7,9 +7,10 @@ INCLUDES = -I/opt/homebrew/lib/R/4.1/site-library/Rcpp/include/ -I/Library/Frame
 LDFLAGS = -L/opt/homebrew/Cellar/boost/1.78.0_1/lib/
 LDLIBS = 
 
-NullModel: APMI.o
 
 ARACNe3: APMI.o MatrixReglistIO.o
+
+NullModel: APMI.o
 
 APMI: 
 

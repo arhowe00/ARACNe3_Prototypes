@@ -1,4 +1,7 @@
 #include "ARACNe3.hpp"
+#include <unistd.h>
+#include <sys/wait.h>
+#include <sys/stat.h>
 
 using namespace std;
 
@@ -9,15 +12,26 @@ using namespace std;
  * e.g. ./ARACNe3 test/regfile.txt test/matrixfile.txt
  */
 int main(int argc, char *argv[]) {
-	bool multithread = true;
+	bool multithread = false;
+	bool compressed = false;
+
+	vector<string> regs;
+	genemap matrix;
+
+	if (compressed == true) {
+		regs = readRegList(string(argv[1]));
+		matrix = readTransformedGexpMatrix(string(argv[2]));
+	} else if (compressed == false) {
+		regs = readRegList(string(argv[1]));
+		matrix = readTransformedGexpMatrix(string(argv[2]));
+	}
+
 	/*
 	 * Multithreading in this application is dynamic and will handle
 	 * computation for each edge MI in parallel.  This is the recommended
 	 * way to run ARACNe3.
 	 */
-	vector<string> regs = readRegList(string(argv[1]));
-	hashmap matrix = readTransformedGexpMatrix(string(argv[2]));
-	if (multithread) {
+	if (multithread == true) {
 		if (mkdir("output", 0777) != 0) return 1;
 		//cout << "REGULATOR\tTARGET\tMI\n";
 		for (auto &reg : regs) {
@@ -28,7 +42,7 @@ int main(int argc, char *argv[]) {
 				auto cout_buff = cout.rdbuf();
 				cout.rdbuf(ofs.rdbuf());
 				
-				hashmapAPMI(matrix, reg, 7.815, 4);
+				genemapAPMI(matrix, reg, 7.815, 4);
 
 				cout.rdbuf(cout_buff);
 				return 0;
@@ -39,9 +53,9 @@ int main(int argc, char *argv[]) {
 		auto cout_buff = cout.rdbuf();
 		cout.rdbuf(ofs.rdbuf());
 
-		cout << "REGULATOR\tTARGET\tMI\n";
+		cout << "REGULATOR\tTARGET\tMI" << endl;
 		for (auto &reg : regs) {
-			hashmapAPMI(matrix, reg, 7.815, 4);
+			genemapAPMI(matrix, reg, 7.815, 4);
 		}
 		cout.rdbuf(cout_buff);
 	}
